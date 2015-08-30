@@ -41,7 +41,7 @@ extra-source-files:    samples/*.hs
   
 Source-repository head
     type:               git
-    location:           git://github.com/KolodeznyDiver/THEff.git
+    location:           https://github.com/KolodeznyDiver/THEff.git
     
 library
   ghc-options:         -Wall 
