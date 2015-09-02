@@ -1,7 +1,5 @@
 {-# OPTIONS_HADDOCK show-extensions #-}
 
-{-# OPTIONS_HADDOCK show-extensions #-}
-
 {-# LANGUAGE  TemplateHaskell, ViewPatterns, RecordWildCards #-}
 module Control.THEff.TH.Internal(mkEff) where
 

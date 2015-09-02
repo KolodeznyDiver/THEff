@@ -1,5 +1,5 @@
 name:                THEff
-version:             0.1.0.1
+version:             0.1.1.0
 synopsis:            TH implementation of effects. 
 license:             BSD3
 license-file:        LICENSE
@@ -53,6 +53,9 @@ library
                        Control.THEff.Writer
                        Control.THEff.Fresh
                        Control.THEff.Validator
+                       Control.THEff.Writer.Strict
+                       Control.THEff.Reader.Strict
+                       Control.THEff.State.Strict 
   
   -- Modules included in this library but not exported.
   other-modules:       Control.THEff.TH.Internal
@@ -68,6 +71,7 @@ library
                        , ScopedTypeVariables
                        , RankNTypes
                        , GADTs
+                       , BangPatterns
   
   -- Other library packages from which modules are imported.
   build-depends:       base >=4.8 && <4.9

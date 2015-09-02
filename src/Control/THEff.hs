@@ -106,7 +106,7 @@ class EffClass w v e where
 newtype NoEff (m:: * -> *) a = NoEff { unNoEff :: a}
 
 -- | This function is used in the 'mkEff' generated runEEEE... functions. 
--- > @effNoEff _ = error "THEff: Attempting to call the effect NoEff that does not have any actions!"@
+-- @effNoEff _ = error "THEff: Attempting to call the effect NoEff that does not have any actions!"@
 effNoEff :: a -> b
 effNoEff _ = error "THEff: Attempting to call the effect NoEff that does not have any actions!"
 

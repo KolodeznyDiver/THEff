@@ -21,8 +21,8 @@ import GHC.Float
 mkEff "MyReader"    ''Reader    ''Int       ''Lift
 mkEff "SomeState"   ''State     ''Bool      ''MyReader
 mkEff "OtherRdr"    ''Reader    ''Float     ''SomeState
-mkEff "MyWriter"     ''Writer   ''String    ''OtherRdr
-mkEff "MyException" ''Except    ''String   ''MyWriter
+mkEff "MyWriter"    ''Writer    ''String    ''OtherRdr
+mkEff "MyException" ''Except    ''String    ''MyWriter
 mkEff "MyCatch"     ''Catch     ''Int       ''MyException
 mkEff "UnicalChar"  ''Fresh     ''Char      ''MyCatch
 mkEff "MyVldtr"     ''Validator ''Float     ''UnicalChar

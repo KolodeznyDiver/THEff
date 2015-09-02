@@ -3,12 +3,13 @@
 {-# LANGUAGE KindSignatures #-}
 {-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE RankNTypes #-}
+{-# LANGUAGE BangPatterns #-}
 
-module Control.THEff.State (
+module Control.THEff.State.Strict (
                       -- * Overview 
 -- |
--- This version builds its output lazily; for a strict version with
--- the same interface, see "Control.THEff.State.Strict".
+-- This version builds its output strictly; for a lazy version with
+-- the same interface, see "Control.THEff.State".
 --
 -- > {-# LANGUAGE KindSignatures #-}
 -- > {-# LANGUAGE FlexibleInstances #-}
@@ -16,7 +17,7 @@ module Control.THEff.State (
 -- > {-# LANGUAGE TemplateHaskell #-}
 -- > 
 -- > import Control.THEff
--- > import Control.THEff.State
+-- > import Control.THEff.State.Strict
 -- > 
 -- > mkEff "Example1"   ''State     ''Int      ''NoEff
 -- > mkEff "Example2"   ''State     ''Float    ''Example1
@@ -87,7 +88,7 @@ runEffState :: forall (t :: * -> *) (u :: (* -> *) -> * -> *) (m :: * -> *)
  -> m  (StateResT z v)
 runEffState outer to un v m = loop v $ runEff m (to . StateResult)
   where 
-    loop s = select . un where
+    loop !s = select . un where
         select (StateOuter f)  = outer f (loop s)
         select (StateAction (State' t k)) = let s' = t s in loop s' (k s')
         select (StateResult r) = return (r,s)
@@ -98,7 +99,7 @@ get = effState $ State' id id
     
 -- | Put state value
 put :: EffClass State' v e => v -> Eff e ()
-put = modify . const
+put !s = modify $ const s
     
 -- | Modify state value
 modify :: EffClass State' v e => (v -> v) -> Eff e ()

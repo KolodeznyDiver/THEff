@@ -3,12 +3,13 @@
 {-# LANGUAGE KindSignatures #-}
 {-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE RankNTypes #-}
+{-# LANGUAGE BangPatterns #-}
 
-module Control.THEff.Reader (
+module Control.THEff.Reader.Strict (
                       -- * Overview 
 -- |
--- This version builds its output lazily; for a strict version with
--- the same interface, see "Control.THEff.Reader.Strict".
+-- This version builds its output strictly; for a lazy version with
+-- the same interface, see "Control.THEff.Reader".
 --
 -- > {-# LANGUAGE KindSignatures #-}
 -- > {-# LANGUAGE FlexibleInstances #-}
@@ -16,7 +17,7 @@ module Control.THEff.Reader (
 -- > {-# LANGUAGE TemplateHaskell #-}
 -- > 
 -- > import Control.THEff
--- > import Control.THEff.Reader
+-- > import Control.THEff.Reader.Strict
 -- > 
 -- > mkEff "CharReader"   ''Reader    ''Char       ''NoEff
 -- > mkEff "StrReader"    ''Reader    ''String     ''CharReader
@@ -79,7 +80,7 @@ runEffReader :: forall (t :: * -> *) (u :: (* -> *) -> * -> *) (m :: * -> *) a v
  -> ReaderArgT v -- ^ The initial value of argument of effect.
  -> Eff r a1
  -> m (ReaderResT a)
-runEffReader outer to un v m = loop $ runEff m (to . ReaderResult)
+runEffReader outer to un !v m = loop $ runEff m (to . ReaderResult)
     where
         loop = select . un
         select (ReaderOuter f)  = outer f loop

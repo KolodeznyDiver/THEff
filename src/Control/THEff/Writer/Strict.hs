@@ -3,12 +3,13 @@
 {-# LANGUAGE KindSignatures #-}
 {-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE RankNTypes #-}
+{-# LANGUAGE BangPatterns #-}
 
-module Control.THEff.Writer (
+module Control.THEff.Writer.Strict (
                       -- * Overview 
 -- |
--- This version builds its output lazily; for a strict version with
--- the same interface, see "Control.THEff.Writer.Strict".
+-- This version builds its output strictly; for a lazy version with
+-- the same interface, see "Control.THEff.Writer".
 --
 -- > {-# LANGUAGE KindSignatures #-}
 -- > {-# LANGUAGE FlexibleInstances #-}
@@ -16,7 +17,7 @@ module Control.THEff.Writer (
 -- > {-# LANGUAGE TemplateHaskell #-}
 -- > 
 -- > import Control.THEff
--- > import Control.THEff.Writer
+-- > import Control.THEff.Writer.Strict
 -- > import Control.Monad(forM_) 
 -- > import Data.Monoid
 -- > 
@@ -57,7 +58,7 @@ import Data.Monoid
 -- | Actually, the effect type
 --  - __/v/__ - Type - the parameter of the effect.
 --  - __/e/__ - mkEff generated type.
-data Writer' v e = Writer' v (() -> e)  
+data Writer' v e = Writer' !v (() -> e)  
 
 -- | Type implements link in the chain of effects.
 --   Constructors must be named __/{EffectName}{Outer|WriterAction|WriterResult}/__
@@ -89,7 +90,7 @@ runEffWriter :: forall (t :: * -> *) (u :: (* -> *) -> * -> *) (m :: * -> *)
  -> m  (WriterResT z v)
 runEffWriter outer to un m = loop mempty $ runEff m (to . WriterResult)
   where 
-    loop s = select . un where
+    loop !s = select . un where
         select (WriterOuter g)  = outer g (loop s)
         select (WriterAction (Writer' v k)) = let s' = s `mappend` v -- (f v)
                                               in loop s' (k ())
@@ -97,4 +98,4 @@ runEffWriter outer to un m = loop mempty $ runEff m (to . WriterResult)
 
 -- | Add value to monoid. 
 tell :: EffClass Writer' v e => v -> Eff e ()
-tell v = effWriter $ Writer' v (const ())
+tell !v = effWriter $ Writer' v (const ())
