@@ -1,5 +1,5 @@
 name:                THEff
-version:             0.1.1.0
+version:             0.1.2.0
 synopsis:            TH implementation of effects. 
 license:             BSD3
 license-file:        LICENSE
@@ -35,16 +35,19 @@ description:
   <http://okmij.org/ftp/Haskell/extensible/exteff.pdf>.
   But, this package is significantly different from the original.
   It uses a chains of ordinary GADTs created by TH. 
-  No Typeable, unsafe... , ExistentialQuantification ...
+  No Typeable, no unsafe... , no ExistentialQuantification ...
 
-extra-source-files:    samples/*.hs
+extra-source-files:    
+    README.md
+    changelog
+    samples/*.hs
   
 Source-repository head
     type:               git
     location:           https://github.com/KolodeznyDiver/THEff.git
     
 library
-  ghc-options:         -Wall 
+  ghc-options:         -Wall  -O2 -fwarn-tabs 
   exposed-modules:     Control.THEff
                        Control.THEff.Reader
                        Control.THEff.State
@@ -74,8 +77,8 @@ library
                        , BangPatterns
   
   -- Other library packages from which modules are imported.
-  build-depends:       base >=4.8 && <4.9
-                      ,template-haskell >=2.4 && <2.11
+  build-depends:       base >= 4.7 && < 5
+                      ,template-haskell >=2.11
   
   -- Directories containing source files.
   hs-source-dirs:      src

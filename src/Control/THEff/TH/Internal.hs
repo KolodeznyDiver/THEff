@@ -24,7 +24,7 @@ getModuleAndName :: Name -> (String,String)
 getModuleAndName = splitLast '.' . show
                     
 parseCon :: Con -> Either String DescrEff
-parseCon (NormalC n [(NotStrict, AppT t@(AppT (ConT e) _) _ )]) = 
+parseCon (NormalC n [(Bang _ _, AppT t@(AppT (ConT e) _) _ )]) = 
         if not (null en) && last en == '\'' then
              Right $ DescrEff nm nn' em (init en) (if en == "Lift'" then Nothing else Just t)
         else Left  $ "Incorrect type name : " ++ en
@@ -46,18 +46,20 @@ mkTypePrim :: String -> [DescrEff] -> Q Dec
 mkTypePrim newType lst = do
     m <- newName "m"
     e <- newName "e"
-    let kinds = [KindedTV m (AppT (AppT ArrowT StarT) StarT), KindedTV e StarT]
+    let kinds = [KindedTV m (AppT (AppT ArrowT StarT) StarT), PlainTV e]
     let n = mkPrimName newType
     let mkc = mkCon (VarT m) (VarT e) newType
     return $ 
         case lst of
-            [d] -> NewtypeD [] n kinds (mkc d) []
-            _ -> DataD [] n kinds (map mkc lst) []
-            
-        
+            [d] -> NewtypeD [] n kinds Nothing (mkc d) []
+            _ -> DataD [] n kinds Nothing (map mkc lst) []
+   
+bangNotStrict:: Bang
+bangNotStrict = Bang NoSourceUnpackedness NoSourceStrictness       
+
 mkCon :: Type -> Type -> String -> DescrEff -> Con
 mkCon m e newType d@DescrEff{..} = 
-    NormalC (mkN_E newType dName) [(NotStrict, AppT 
+    NormalC (mkN_E newType dName) [(bangNotStrict, AppT 
       ( case dType of
             (Just t) -> t
             _ -> AppT (ConT $ mkEffName' d) m
@@ -71,10 +73,9 @@ mkTypeMain thisMdl newType newTypeName effName argT = do
     let t' = mkPrimName $ thisMdl ++ newType
     let u = mkName $ "un" ++ newType
     return $
-        NewtypeD [] n [KindedTV m (AppT (AppT ArrowT StarT) StarT),
-                                    KindedTV a StarT]
+        NewtypeD [] n [KindedTV m (AppT (AppT ArrowT StarT) StarT), PlainTV a] Nothing 
                 (RecC n 
-                    [(u,NotStrict,
+                    [(u,bangNotStrict,
                         AppT (AppT (AppT (AppT 
                           (AppT (ConT effName) (VarT m))
                           (AppT (AppT (ConT newTypeName) (VarT m))
@@ -113,7 +114,7 @@ mkInstn thisMdl newType newTypeName thisEffName it DescrEff{..} = do
     a <- newName "a"
     x <- newName "x"
     let fullNewType = thisMdl ++ newType
-    return $ InstanceD [] (AppT  
+    return $ InstanceD Nothing [] (AppT  
         (case dType of
             (Just (AppT effT argT)) -> AppT (AppT (ConT c) effT) argT
             _ -> AppT (ConT c) (VarT m)
@@ -133,8 +134,8 @@ is2ar t = do
     (TyConI d) <- reify t
     return (case d of
                 (TySynD _ [_,_] _) -> True
-                (NewtypeD [] _ [_,_] _ _) -> True
-                (DataD _ _ [_,_] _ _) -> True
+                (NewtypeD [] _ [_,_] _ _ _) -> True
+                (DataD _ _ [_,_] _ _ _) -> True
                 _ -> False
             )
             
@@ -155,7 +156,7 @@ mkRunFun thisMdl newType newTypeName thisEffName argT outerName ds = do
                         (AppT -- arg 5 
                             (AppT ArrowT (AppT (AppT (ConT _) (VarT _)) (VarT _))) 
                             (AppT (VarT _) _
-                        ))))))) _ _ ) -> True
+                        ))))))) _ ) -> True
                     _ -> False
     resTName <- lookEffType $ concat [tm,tn,"ResT"] 
     m <- newName "m"
@@ -249,8 +250,8 @@ mkEff newType effName effArg outt = do
         else do
             oi <- reify outt
             case oi of
-                TyConI (NewtypeD [] _ [_,_] (RecC (ocmp -> True)
-                    [(_,NotStrict,
+                TyConI (NewtypeD [] _ [_,_] _ (RecC (ocmp -> True)
+                    [(_,Bang _ _,
                         AppT (AppT (AppT (AppT 
                           (AppT (ConT te) _ ) _
                                           )
@@ -263,8 +264,8 @@ mkEff newType effName effArg outt = do
                         opi <- reify tep
                         let ~(TyConI dec) = opi
                         let lst = case dec of
-                                    (NewtypeD [] _ [_,_] c  []) -> [parseCon c]
-                                    (DataD    [] _ [_,_] cl []) -> map parseCon cl
+                                    (NewtypeD [] _ [_,_] _ c  []) -> [parseCon c]
+                                    (DataD    [] _ [_,_] _ cl []) -> map parseCon cl
                                     _ -> [Left $ "Incorrect type " ++ show tep]
                                   
                         case lefts lst of
