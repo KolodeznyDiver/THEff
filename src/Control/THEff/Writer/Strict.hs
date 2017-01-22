@@ -19,7 +19,6 @@ module Control.THEff.Writer.Strict (
 -- > import Control.THEff
 -- > import Control.THEff.Writer.Strict
 -- > import Control.Monad(forM_) 
--- > import Data.Monoid
 -- > 
 -- > type IntAccum = Sum Int
 -- > 
@@ -53,7 +52,6 @@ module Control.THEff.Writer.Strict (
                           ) where
 
 import Control.THEff
-import Data.Monoid
 
 -- | Actually, the effect type
 --  - __/v/__ - Type - the parameter of the effect.

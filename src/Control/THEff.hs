@@ -127,7 +127,7 @@ class EffClassM m e where
     toEffM:: Lift' m e -> e
 
 -- | Lift a Monad to an Effect.
-lift:: (Monad m, EffClassM m e) => m a -> Eff e a
+lift:: EffClassM m e => m a -> Eff e a
 lift m = effLift $ Lift' m id
 
 -- | The first effect in a chain of monadic effects.

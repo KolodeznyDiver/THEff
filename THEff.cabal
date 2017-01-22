@@ -1,5 +1,5 @@
 name:                THEff
-version:             0.1.2.0
+version:             0.1.3
 synopsis:            TH implementation of effects. 
 license:             BSD3
 license-file:        LICENSE

@@ -107,7 +107,7 @@ chk :: EffClass Validator' v e => v -> Eff e v
 chk v = effValidator $ Validator' v id
 
 -- | validator returns __/Right v/__ if the predicate returns True and __/Left v/__ else.
-validator :: Ord v => 
+validator :: 
     (v -> Bool) -- ^ predicate
  -> v           -- ^ value
  -> Either v v  

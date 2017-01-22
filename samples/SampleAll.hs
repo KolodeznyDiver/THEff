@@ -15,7 +15,6 @@ import Control.THEff.Fresh
 import Control.THEff.Validator
 import System.Environment (getProgName)
 import Control.Monad 
-import Data.Either
 import GHC.Float 
 
 mkEff "MyReader"    ''Reader    ''Int       ''Lift
@@ -55,4 +54,4 @@ main = do
                 x <- chk $ fromIntegral i * f         -- MyVldtr  
                 return $ float2Double x
             return $ either ((++ " is out of range") . show) show r
-    print r
+    print r 

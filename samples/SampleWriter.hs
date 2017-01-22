@@ -2,7 +2,6 @@
 {-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
 {-# LANGUAGE TemplateHaskell #-}
-{-# # LANGUAGE ScopedTypeVariables #-} 
 module Main where
 
 import Control.THEff
@@ -23,4 +22,4 @@ main = putStrLn $ uncurry (flip (++)) $ runStrWriter $ do
                 forM_ [1::Int .. 10]
                     (tell . Sum)
                 return (pi :: Float)
-            return $ show $ r * fromIntegral v
+            return $ show $ r * fromIntegral v 

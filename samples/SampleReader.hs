@@ -2,7 +2,6 @@
 {-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
 {-# LANGUAGE TemplateHaskell #-}
-{-# # LANGUAGE ScopedTypeVariables #-} 
 module Main where
 
 import Control.THEff
